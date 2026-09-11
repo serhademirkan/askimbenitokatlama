@@ -58,6 +58,33 @@
             25% { transform: translateX(-8px) rotate(-3deg); }
             75% { transform: translateX(8px) rotate(3deg); }
         }
+
+        /* --- GECE MODU & KORKMA VE TIKLA BÖLÜMÜ STİLLERİ --- */
+        #goodnight-modal {
+            transition: all 0.3s ease;
+        }
+        .love-heartbeat {
+            animation: heartbeat 1s infinite;
+        }
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        .flying-heart {
+            position: fixed;
+            bottom: -60px;
+            color: #d00000;
+            pointer-events: none;
+            animation: flyHeart linear forwards;
+            z-index: 9999;
+        }
+        @keyframes flyHeart {
+            0% { transform: translateY(0) rotate(0deg) scale(0.6); opacity: 0; }
+            10% { opacity: 1; }
+            50% { transform: translateY(-50vh) rotate(180deg) scale(1.2); opacity: 1; }
+            100% { transform: translateY(-115vh) rotate(360deg) scale(0.8); opacity: 0; }
+        }
+
         /* Custom Scrollbar for logs */
         ::-webkit-scrollbar {
             width: 6px;
@@ -135,6 +162,11 @@
                     <span>💋</span> ÖPTÜM! (Sıfırla)
                 </button>
             </div>
+
+            <!-- GECE SÜRPRİZİ: KORKMA VE TIKLA BUTONU -->
+            <button id="open-goodnight-btn" onclick="openGoodNightModal()" class="w-full mt-3 py-3.5 px-4 rounded-xl font-extrabold text-sm bg-gradient-to-r from-purple-600 via-pink-600 to-red-500 hover:opacity-95 active:scale-95 text-white shadow-lg shadow-pink-200 transition-all flex items-center justify-center gap-2 border border-pink-300 animate-pulse">
+                <span>🌙</span> KORKMA VE TIKLA! (Sürprizzzz) ❤️
+            </button>
         </section>
 
         <!-- RIGHT COLUMN: Audio Controls, Intensity & Audit Trail -->
@@ -191,6 +223,28 @@
     <footer class="mt-6 text-center text-xs text-slate-400 font-medium">
         Resmi Poğaça Yanak Tokatlama & Aşk Koruma Algoritması © 2026 Beyza & Husband Ltd. Şti.
     </footer>
+
+    <!-- KORKMA VE TIKLA FULLSCREEN MODAL / SURPRISE OVERLAY -->
+    <div id="goodnight-modal" class="fixed inset-0 bg-black z-50 hidden flex-col justify-center items-center text-center p-4">
+        
+        <!-- Modal Kapatma Butonu -->
+        <button onclick="closeGoodNightModal()" class="absolute top-5 right-5 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-xs font-bold backdrop-blur transition">
+            ✕ Tokat Makinesine Dön
+        </button>
+
+        <div id="gn-welcome" class="text-white text-3xl sm:text-6xl font-bold mb-8 transition-all">
+            Hoş geldin sevgilim ❤️
+        </div>
+
+        <button id="gn-fearless-btn" onclick="triggerLoveMode()" class="bg-red-600 hover:bg-red-700 text-white font-black text-xl sm:text-2xl px-8 py-5 rounded-2xl shadow-[0_0_30px_rgba(255,0,0,0.6)] transition-all hover:scale-105 active:scale-95 cursor-pointer">
+            Korkma ve tıkla 💌
+        </button>
+
+        <div id="gn-love-message" class="hidden text-red-700 text-3xl sm:text-6xl lg:text-7xl font-black text-shadow-white love-heartbeat p-4 z-10 leading-tight">
+            İyi geceler sevgilim ❤️<br>
+            <span class="text-2xl sm:text-5xl font-extrabold text-white block mt-3 drop-shadow-lg">Sana deli gibi aşığım! 💖</span>
+        </div>
+    </div>
 
     <script>
         let slapCount = 0;
@@ -465,6 +519,90 @@
             logContainer.innerHTML = '';
             addLog('Günlük temizlendi.');
         });
+
+        /* --- KORKMA VE TIKLA / İYİ GECELER SÜRPRİZ MODU FONKSİYONLARI --- */
+        let heartInterval = null;
+
+        function openGoodNightModal() {
+            initAudio();
+            const modal = document.getElementById('goodnight-modal');
+            const welcome = document.getElementById('gn-welcome');
+            const btn = document.getElementById('gn-fearless-btn');
+            const loveMsg = document.getElementById('gn-love-message');
+
+            modal.style.backgroundColor = '#000000';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            welcome.style.display = 'block';
+            btn.style.display = 'inline-block';
+            loveMsg.classList.add('hidden');
+
+            addLog('Gece Sürprizi Ekranı Açıldı 🌙', 'kiss');
+        }
+
+        function closeGoodNightModal() {
+            const modal = document.getElementById('goodnight-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+
+            if (heartInterval) {
+                clearInterval(heartInterval);
+                heartInterval = null;
+            }
+
+            // Kalpleri temizle
+            document.querySelectorAll('.flying-heart').forEach(h => h.remove());
+        }
+
+        function triggerLoveMode() {
+            initAudio();
+            playKissSound();
+
+            const modal = document.getElementById('goodnight-modal');
+            const welcome = document.getElementById('gn-welcome');
+            const btn = document.getElementById('gn-fearless-btn');
+            const loveMsg = document.getElementById('gn-love-message');
+
+            // Ekranı pembe yap
+            modal.style.backgroundColor = '#ff69b4';
+
+            // İlk yazıyı ve butonu gizle
+            welcome.style.display = 'none';
+            btn.style.display = 'none';
+
+            // Aşk mesajını göster
+            loveMsg.classList.remove('hidden');
+
+            // Sürekli kalp yağmuru
+            if (heartInterval) clearInterval(heartInterval);
+            heartInterval = setInterval(createFlyingHeart, 120);
+
+            // İlk anda yoğun kalp patlaması
+            for (let i = 0; i < 40; i++) {
+                setTimeout(createFlyingHeart, i * 35);
+            }
+
+            addLog('Sana deli gibi aşığım mesajı gösterildi! ❤️', 'kiss');
+        }
+
+        function createFlyingHeart() {
+            const heart = document.createElement("div");
+            heart.classList.add("flying-heart");
+
+            const hearts = ["❤️", "♥️", "💗", "💖", "💕", "🥐"];
+            heart.innerHTML = hearts[Math.floor(Math.random() * hearts.length)];
+
+            heart.style.left = Math.random() * 95 + "vw";
+            heart.style.fontSize = (24 + Math.random() * 45) + "px";
+            heart.style.animationDuration = (3 + Math.random() * 4) + "s";
+
+            document.body.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 7500);
+        }
 
         window.onload = function() {
             updateCounterDisplay();
